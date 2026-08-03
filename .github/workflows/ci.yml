@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: android-advanced-hello-world
+      - uses: actions/checkout@v4
+        with:
+          repository: YutakaX17/kmp-advanced-hello-world-core
+          ref: feature/bootstrap-kmp-core
+          path: kmp-advanced-hello-world-core
+      - uses: actions/checkout@v4
+        with:
+          repository: YutakaX17/compose-advanced-hello-world-core
+          ref: feature/bootstrap-compose-core
+          path: compose-advanced-hello-world-core
+      - uses: actions/checkout@v4
+        with:
+          repository: YutakaX17/kmp-advanced-hello-world-messages
+          ref: feature/offline-message-storage
+          path: kmp-advanced-hello-world-messages
+      - uses: actions/checkout@v4
+        with:
+          repository: YutakaX17/compose-advanced-hello-world-messages
+          ref: feature/bootstrap-compose-messages
+          path: compose-advanced-hello-world-messages
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew --no-daemon check assembleDebug
+        working-directory: android-advanced-hello-world

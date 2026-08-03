@@ -1,0 +1,18 @@
+[versions]
+agp = "9.2.0"
+kotlin = "2.4.10"
+compose = "1.11.1"
+activity-compose = "1.12.4"
+family = "0.1.0-SNAPSHOT"
+
+[libraries]
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+advanced-hello-world-kmp-core = { module = "io.github.yutakax17.advancedhelloworld:kmp-advanced-hello-world-core", version.ref = "family" }
+advanced-hello-world-compose-core = { module = "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-core", version.ref = "family" }
+advanced-hello-world-kmp-messages = { module = "io.github.yutakax17.advancedhelloworld:kmp-advanced-hello-world-messages", version.ref = "family" }
+advanced-hello-world-compose-messages = { module = "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-messages", version.ref = "family" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
