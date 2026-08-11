@@ -18,7 +18,7 @@ import io.github.yutakax17.advancedhelloworld.messages.validateMessageText
 import java.util.UUID
 
 public class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?): Unit {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val controller = PreviewMessagesController()
         setContent {
@@ -40,15 +40,17 @@ private class PreviewMessagesController : MessagesActions {
     var state: MessagesState by mutableStateOf(MessagesState())
         private set
 
-    override fun updateDraft(text: String): Unit {
+    override fun updateDraft(text: String) {
         state = state.copy(draftText = text, userMessage = null)
     }
 
-    override fun submit(): Unit {
+    override fun submit() {
         when (val validation = validateMessageText(state.draftText)) {
             MessageValidation.Blank -> state = state.copy(userMessage = "Enter a message.")
+
             is MessageValidation.TooLong ->
                 state = state.copy(userMessage = "Messages can contain at most ${validation.maximumLength} characters.")
+
             is MessageValidation.Valid -> {
                 val message = Message(
                     localId = UUID.randomUUID().toString(),
@@ -67,11 +69,11 @@ private class PreviewMessagesController : MessagesActions {
         }
     }
 
-    override fun refresh(): Unit {
+    override fun refresh() {
         state = state.copy(userMessage = "Backend retrieval is not wired yet.")
     }
 
-    override fun retry(localId: String): Unit {
+    override fun retry(localId: String) {
         state = state.copy(userMessage = "Synchronization retry is not wired yet.")
     }
 }
