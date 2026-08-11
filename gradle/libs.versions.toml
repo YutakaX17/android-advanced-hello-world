@@ -8,6 +8,10 @@ spotless = "8.8.0"
 detekt = "1.23.8"
 dependency-analysis = "3.17.0"
 dependency-check = "12.2.2"
+sqldelight = "2.3.2"
+junit = "4.13.2"
+robolectric = "4.16.1"
+androidx-test-core = "1.7.0"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
@@ -15,6 +19,10 @@ advanced-hello-world-kmp-core = { module = "io.github.yutakax17.advancedhellowor
 advanced-hello-world-compose-core = { module = "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-core", version.ref = "family" }
 advanced-hello-world-kmp-messages = { module = "io.github.yutakax17.advancedhelloworld:kmp-advanced-hello-world-messages", version.ref = "family" }
 advanced-hello-world-compose-messages = { module = "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-messages", version.ref = "family" }
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+junit = { module = "junit:junit", version.ref = "junit" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

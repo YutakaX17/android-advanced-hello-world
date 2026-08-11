@@ -20,6 +20,10 @@ android {
         compose = true
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
@@ -31,6 +35,11 @@ dependencies {
     implementation(libs.advanced.hello.world.compose.core)
     implementation(libs.advanced.hello.world.kmp.messages)
     implementation(libs.advanced.hello.world.compose.messages)
+    implementation(libs.sqldelight.android.driver)
+
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
 
 val checkModuleRegistry =
