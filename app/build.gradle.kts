@@ -33,12 +33,13 @@ dependencies {
     implementation(libs.advanced.hello.world.compose.messages)
 }
 
-val checkModuleRegistry = tasks.register<Exec>("checkModuleRegistry") {
-    group = "verification"
-    description = "Validates modules.json and verifies that the generated registry is current."
-    workingDir(rootDir)
-    commandLine("python3", "scripts/generate_feature_registry.py", "--check")
-}
+val checkModuleRegistry =
+    tasks.register<Exec>("checkModuleRegistry") {
+        group = "verification"
+        description = "Validates modules.json and verifies that the generated registry is current."
+        workingDir(rootDir)
+        commandLine("python3", "scripts/generate_feature_registry.py", "--check")
+    }
 
 tasks.named("check") {
     dependsOn(checkModuleRegistry)
