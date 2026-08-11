@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: android-advanced-hello-world
+      - uses: actions/setup-java@d7793b545071e98d581d3bf084a51c3213318a07 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4
+        with:
+          validate-wrappers: true
+      - name: Validate modules manifest and generated registry
+        working-directory: android-advanced-hello-world
+        run: |
+          python3 scripts/generate_feature_registry.py --check
+          python3 -m unittest discover -s scripts/tests
+      - name: Resolve published releases, test, lint, and build standalone APK
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew --no-daemon spotlessCheck detekt check lintDebug assembleDebug
+        working-directory: android-advanced-hello-world
