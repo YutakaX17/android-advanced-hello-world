@@ -3,27 +3,36 @@ package io.github.yutakax17.advancedhelloworld.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import io.github.yutakax17.advancedhelloworld.compose.core.AppShell
-import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesActions
 import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesFeatureFactory
-import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesState
+import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesInteractor
+import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesStateHolder
 import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesUiDependencies
+import io.github.yutakax17.advancedhelloworld.core.SyncResult
+import io.github.yutakax17.advancedhelloworld.messages.CreateMessageResult
 import io.github.yutakax17.advancedhelloworld.messages.Message
 import io.github.yutakax17.advancedhelloworld.messages.MessageSyncState
 import io.github.yutakax17.advancedhelloworld.messages.MessageValidation
 import io.github.yutakax17.advancedhelloworld.messages.validateMessageText
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 public class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val controller = PreviewMessagesController()
         setContent {
+            val scope = rememberCoroutineScope()
+            val stateHolder = remember(controller, scope) {
+                MessagesStateHolder(controller, scope)
+            }
             val feature = MessagesFeatureFactory.create(
-                MessagesUiDependencies(controller.state, controller),
+                MessagesUiDependencies(stateHolder),
             )
             AppShell {
                 feature.destinations.single().content()
@@ -36,44 +45,31 @@ public class MainActivity : ComponentActivity() {
  * Temporary assembler adapter. Durable SQLDelight storage and backend synchronization
  * replace this adapter in the next feature slice without changing the feature UI contract.
  */
-private class PreviewMessagesController : MessagesActions {
-    var state: MessagesState by mutableStateOf(MessagesState())
-        private set
+private class PreviewMessagesController : MessagesInteractor {
+    private val messages = MutableStateFlow<List<Message>>(emptyList())
 
-    override fun updateDraft(text: String) {
-        state = state.copy(draftText = text, userMessage = null)
-    }
+    override fun observeMessages(): Flow<List<Message>> = messages.asStateFlow()
 
-    override fun submit() {
-        when (val validation = validateMessageText(state.draftText)) {
-            MessageValidation.Blank -> state = state.copy(userMessage = "Enter a message.")
-
-            is MessageValidation.TooLong ->
-                state = state.copy(userMessage = "Messages can contain at most ${validation.maximumLength} characters.")
-
-            is MessageValidation.Valid -> {
-                val message = Message(
-                    localId = UUID.randomUUID().toString(),
-                    remoteId = null,
-                    text = validation.normalizedText,
-                    createdAtLocal = System.currentTimeMillis(),
-                    createdAtServer = null,
-                    syncState = MessageSyncState.PENDING,
-                )
-                state = state.copy(
-                    messages = listOf(message) + state.messages,
-                    draftText = "",
-                    userMessage = "Saved on this device; synchronization is not wired yet.",
-                )
-            }
+    override suspend fun createMessage(text: String): CreateMessageResult {
+        val validation = validateMessageText(text)
+        if (validation !is MessageValidation.Valid) {
+            return CreateMessageResult.Rejected(validation)
         }
+        val message = Message(
+            localId = UUID.randomUUID().toString(),
+            remoteId = null,
+            text = validation.normalizedText,
+            createdAtLocal = System.currentTimeMillis(),
+            createdAtServer = null,
+            syncState = MessageSyncState.PENDING,
+        )
+        messages.update { current -> listOf(message) + current }
+        return CreateMessageResult.Created(message)
     }
 
-    override fun refresh() {
-        state = state.copy(userMessage = "Backend retrieval is not wired yet.")
-    }
+    override suspend fun refresh(): SyncResult =
+        SyncResult.Retry("Backend retrieval is not wired yet.")
 
-    override fun retry(localId: String) {
-        state = state.copy(userMessage = "Synchronization retry is not wired yet.")
-    }
+    override suspend fun retry(localId: String): SyncResult =
+        SyncResult.Retry("Synchronization retry is not wired yet for $localId.")
 }
