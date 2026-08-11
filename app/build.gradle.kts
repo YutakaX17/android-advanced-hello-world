@@ -33,7 +33,7 @@ dependencies {
     implementation(libs.advanced.hello.world.compose.messages)
 }
 
-val checkModuleRegistry by tasks.registering(Exec::class) {
+val checkModuleRegistry = tasks.register<Exec>("checkModuleRegistry") {
     group = "verification"
     description = "Validates modules.json and verifies that the generated registry is current."
     workingDir(rootDir)

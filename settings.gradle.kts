@@ -18,7 +18,7 @@ dependencyResolutionManagement {
             "compose-advanced-hello-world-messages",
         ).forEach { repositoryName ->
             maven {
-                name = "GitHubPackages-${repositoryName}"
+                name = "GitHubPackages-$repositoryName"
                 url = uri("https://maven.pkg.github.com/YutakaX17/$repositoryName")
                 credentials {
                     username = providers.environmentVariable("GITHUB_ACTOR").orNull
@@ -32,9 +32,11 @@ dependencyResolutionManagement {
     }
 }
 
-val useLocalCompositeBuilds = providers.gradleProperty("useLocalCompositeBuilds")
-    .map(String::toBoolean)
-    .getOrElse(false)
+val useLocalCompositeBuilds =
+    providers
+        .gradleProperty("useLocalCompositeBuilds")
+        .map(String::toBoolean)
+        .getOrElse(false)
 
 if (useLocalCompositeBuilds) {
     includeBuild("../kmp-advanced-hello-world-core") {
