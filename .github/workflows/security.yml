@@ -9,7 +9,12 @@ on:
 
 permissions:
   contents: read
+  packages: read
   security-events: write
+
+env:
+  GITHUB_ACTOR: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   dependency-review:

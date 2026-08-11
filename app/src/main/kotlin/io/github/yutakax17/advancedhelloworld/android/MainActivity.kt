@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.yutakax17.advancedhelloworld.compose.core.AppShell
-import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesFeatureFactory
 import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesInteractor
 import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesStateHolder
 import io.github.yutakax17.advancedhelloworld.compose.messages.MessagesUiDependencies
@@ -31,11 +30,12 @@ public class MainActivity : ComponentActivity() {
             val stateHolder = remember(controller, scope) {
                 MessagesStateHolder(controller, scope)
             }
-            val feature = MessagesFeatureFactory.create(
-                MessagesUiDependencies(stateHolder),
+            val features = GeneratedFeatureRegistry.createFeatures(
+                messagesDependencies = MessagesUiDependencies(stateHolder),
             )
+            val startDestination = GeneratedFeatureRegistry.startDestination(features)
             AppShell {
-                feature.destinations.single().content()
+                startDestination.content()
             }
         }
     }

@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   build:
@@ -15,26 +16,6 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: android-advanced-hello-world
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: YutakaX17/kmp-advanced-hello-world-core
-          ref: ffe254219bd333395942c2736af9aa29c97e0556
-          path: kmp-advanced-hello-world-core
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: YutakaX17/compose-advanced-hello-world-core
-          ref: 87ab26ef9fb0bf338874d256422b49b369981c0a
-          path: compose-advanced-hello-world-core
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: YutakaX17/kmp-advanced-hello-world-messages
-          ref: d7ce9a21953cb9854952ce80a25df8508b606ed5
-          path: kmp-advanced-hello-world-messages
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: YutakaX17/compose-advanced-hello-world-messages
-          ref: 1669e175d920bb25ac5154800dbcef2be84faabd
-          path: compose-advanced-hello-world-messages
       - uses: actions/setup-java@d7793b545071e98d581d3bf084a51c3213318a07 # v4
         with:
           distribution: temurin
@@ -42,6 +23,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4
         with:
           validate-wrappers: true
-      - name: Formatting, static analysis, tests, lint, and APK
+      - name: Validate modules manifest and generated registry
+        working-directory: android-advanced-hello-world
+        run: |
+          python3 scripts/generate_feature_registry.py --check
+          python3 -m unittest discover -s scripts/tests
+      - name: Resolve published releases, test, lint, and build standalone APK
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew --no-daemon spotlessCheck detekt check lintDebug assembleDebug
         working-directory: android-advanced-hello-world
