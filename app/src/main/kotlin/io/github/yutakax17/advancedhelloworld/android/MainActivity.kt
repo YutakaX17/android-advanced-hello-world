@@ -69,7 +69,5 @@ private class PreviewMessagesController : MessagesInteractor {
 
     override suspend fun refresh(): SyncResult = SyncResult.Retry("Backend retrieval is not wired yet.")
 
-    override suspend fun retry(localId: String): SyncResult {
-        return SyncResult.Retry("Synchronization retry is not wired yet for $localId.")
-    }
+    override suspend fun retry(localId: String): SyncResult = SyncResult.Retry("Retry is not wired for $localId.")
 }
