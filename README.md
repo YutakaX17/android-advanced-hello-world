@@ -30,7 +30,7 @@ python3 -m unittest discover -s scripts/tests
 
 The Gradle `check` lifecycle also runs the generated-registry currentness check.
 
-The foundation composes the four immutable `0.1.0` family releases and demonstrates
-offline-first UI state through a temporary in-memory adapter. Durable SQLDelight
-persistence, background synchronization, and backend transport are deliberately tracked
-as subsequent reviewable slices.
+The application composes the four immutable `0.1.0` family releases. Its process-scoped
+Android SQLDelight driver backs the shared durable message repository, so locally created
+messages and pending outbox operations survive activity and process recreation. Background
+synchronization and backend transport remain separate, ordered implementation slices.
