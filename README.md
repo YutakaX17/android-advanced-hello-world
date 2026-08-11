@@ -12,6 +12,7 @@ then run:
 ./gradlew check assembleDebug
 ```
 
-The initial feature slice demonstrates composition and offline-first UI state. Durable
-SQLDelight persistence, background synchronization, and backend transport are deliberately
-tracked as subsequent slices.
+The foundation composes the four immutable `0.1.0` family releases and demonstrates
+offline-first UI state through a temporary in-memory adapter. Durable SQLDelight
+persistence, background synchronization, and backend transport are deliberately tracked
+as subsequent reviewable slices.
