@@ -16,11 +16,11 @@ import io.github.yutakax17.advancedhelloworld.messages.Message
 import io.github.yutakax17.advancedhelloworld.messages.MessageSyncState
 import io.github.yutakax17.advancedhelloworld.messages.MessageValidation
 import io.github.yutakax17.advancedhelloworld.messages.validateMessageText
-import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 
 public class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,9 +67,7 @@ private class PreviewMessagesController : MessagesInteractor {
         return CreateMessageResult.Created(message)
     }
 
-    override suspend fun refresh(): SyncResult =
-        SyncResult.Retry("Backend retrieval is not wired yet.")
+    override suspend fun refresh(): SyncResult = SyncResult.Retry("Backend retrieval is not wired yet.")
 
-    override suspend fun retry(localId: String): SyncResult =
-        SyncResult.Retry("Synchronization retry is not wired yet for $localId.")
+    override suspend fun retry(localId: String): SyncResult = SyncResult.Retry("Synchronization retry is not wired yet for $localId.")
 }
