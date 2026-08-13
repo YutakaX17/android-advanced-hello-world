@@ -55,7 +55,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
-          python -m advanced_hello_world.module_installer modules.json --local-root ..
+          python -m pip install --no-deps ../advanced-hello-world-be-core ../advanced-hello-world-be-messages
+          python -c 'import advanced_hello_world_core.module, advanced_hello_world_messages.module'
+          python -m advanced_hello_world.module_manifest modules.json --check-installed
           docker run --name advanced-hello-world-e2e-db --health-cmd 'pg_isready -U advanced_hello_world -d advanced_hello_world' --health-interval 2s --health-retries 30 -e POSTGRES_DB=advanced_hello_world -e POSTGRES_USER=advanced_hello_world -e POSTGRES_PASSWORD=integration-password -p 5432:5432 -d postgres:17.5-alpine
           until [ "$(docker inspect --format='{{.State.Health.Status}}' advanced-hello-world-e2e-db)" = healthy ]; do sleep 2; done
           python manage.py migrate
