@@ -4,6 +4,38 @@ plugins {
     alias(libs.plugins.jetbrains.compose)
 }
 
+val releaseApiBaseUrl = providers.gradleProperty("releaseApiBaseUrl").orElse("")
+
+val validateReleaseApiBaseUrl =
+    tasks.register<Exec>("validateReleaseApiBaseUrl") {
+        group = "verification"
+        description = "Requires a non-empty HTTPS backend URL for release builds."
+        workingDir(rootDir)
+        commandLine(
+            "python3",
+            "scripts/validate_release_endpoint.py",
+            "--url",
+            releaseApiBaseUrl.get(),
+        )
+    }
+
+val verifyReleaseBuildConfig =
+    tasks.register<Exec>("verifyReleaseBuildConfig") {
+        group = "verification"
+        description = "Verifies the exact HTTPS endpoint embedded in release BuildConfig."
+        dependsOn("generateReleaseBuildConfig")
+        workingDir(rootDir)
+        commandLine(
+            "python3",
+            "scripts/verify_release_build_config.py",
+            "--build-config",
+            "app/build/generated/source/buildConfig/release/" +
+                "io/github/yutakax17/advancedhelloworld/android/BuildConfig.java",
+            "--expected-url",
+            releaseApiBaseUrl.get(),
+        )
+    }
+
 android {
     namespace = "io.github.yutakax17.advancedhelloworld.android"
     compileSdk = 37
@@ -12,11 +44,26 @@ android {
         applicationId = "io.github.yutakax17.advancedhelloworld"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+        }
+        release {
+            val escapedUrl =
+                releaseApiBaseUrl
+                    .get()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+            buildConfigField("String", "API_BASE_URL", "\"$escapedUrl\"")
+        }
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -29,6 +76,15 @@ android {
     }
 }
 
+tasks.configureEach {
+    if (name == "preReleaseBuild") {
+        dependsOn(validateReleaseApiBaseUrl)
+    }
+    if (name == "assembleRelease" || name == "lintRelease") {
+        dependsOn(verifyReleaseBuildConfig)
+    }
+}
+
 dependencies {
     implementation(libs.activity.compose)
     implementation(libs.advanced.hello.world.kmp.core)
@@ -36,10 +92,14 @@ dependencies {
     implementation(libs.advanced.hello.world.kmp.messages)
     implementation(libs.advanced.hello.world.compose.messages)
     implementation(libs.sqldelight.android.driver)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.work.runtime)
 
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.junit)
+    testImplementation(libs.ktor.client.mock)
     testImplementation(libs.robolectric)
+    testImplementation(libs.work.testing)
 }
 
 val checkModuleRegistry =

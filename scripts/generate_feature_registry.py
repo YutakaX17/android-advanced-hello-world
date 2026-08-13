@@ -66,16 +66,19 @@ def load_and_validate() -> dict:
     if manifest["startFeatureId"] not in features:
         raise ValueError("startFeatureId must identify a declared feature")
     catalog = tomllib.loads(CATALOG.read_text(encoding="utf-8"))
-    catalog_version = catalog["versions"]["family"]
-    if manifest["distributionVersion"] != catalog_version:
-        raise ValueError("distributionVersion must match the family version catalog")
-    if any(module["version"] != catalog_version for module in modules):
-        raise ValueError("every module version must match the pinned family version")
-    catalog_coordinates = {
-        library["module"]
+    catalog_versions = catalog["versions"]
+    if manifest["distributionVersion"] != catalog_versions["distribution"]:
+        raise ValueError("distributionVersion must match the distribution version catalog")
+    family_libraries = {
+        library["module"]: catalog_versions[library["version"]["ref"]]
         for name, library in catalog["libraries"].items()
         if name.startswith("advanced-hello-world-")
     }
+    for module in modules:
+        expected_version = family_libraries.get(module["coordinate"])
+        if module["version"] != expected_version:
+            raise ValueError(f"module version does not match the version catalog: {module['id']}")
+    catalog_coordinates = set(family_libraries)
     if coordinates != catalog_coordinates:
         raise ValueError("module coordinates must exactly match the version catalog")
     return manifest
