@@ -55,3 +55,9 @@ Tagged releases are fail-closed and require the protected `release` environment 
 `modules.json`, builds signed APK/AAB artifacts, verifies both signatures, validates the AAB
 with integrity-pinned bundletool, records checksums and component metadata, and emits GitHub
 build provenance.
+
+The Integration workflow boots immutable backend/core/messages revisions with PostgreSQL and
+runs an Android instrumentation journey on an emulator. It proves that an offline message
+survives store recreation, uploads after synchronization, and that a backend-originated
+message is retrieved into the same durable local database. Tagged releases call this workflow
+as a required gate before signing or publication.

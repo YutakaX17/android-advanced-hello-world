@@ -50,6 +50,7 @@ android {
         targetSdk = 37
         versionCode = 2
         versionName = "0.2.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -121,6 +122,10 @@ dependencies {
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.robolectric)
     testImplementation(libs.work.testing)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.junit)
 }
 
 val checkModuleRegistry =
