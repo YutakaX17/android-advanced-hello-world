@@ -19,6 +19,23 @@ val validateReleaseApiBaseUrl =
         )
     }
 
+val verifyReleaseBuildConfig =
+    tasks.register<Exec>("verifyReleaseBuildConfig") {
+        group = "verification"
+        description = "Verifies the exact HTTPS endpoint embedded in release BuildConfig."
+        dependsOn("generateReleaseBuildConfig")
+        workingDir(rootDir)
+        commandLine(
+            "python3",
+            "scripts/verify_release_build_config.py",
+            "--build-config",
+            "app/build/generated/source/buildConfig/release/" +
+                "io/github/yutakax17/advancedhelloworld/android/BuildConfig.java",
+            "--expected-url",
+            releaseApiBaseUrl.get(),
+        )
+    }
+
 android {
     namespace = "io.github.yutakax17.advancedhelloworld.android"
     compileSdk = 37
@@ -62,6 +79,9 @@ android {
 tasks.configureEach {
     if (name == "preReleaseBuild") {
         dependsOn(validateReleaseApiBaseUrl)
+    }
+    if (name == "assembleRelease" || name == "lintRelease") {
+        dependsOn(verifyReleaseBuildConfig)
     }
 }
 

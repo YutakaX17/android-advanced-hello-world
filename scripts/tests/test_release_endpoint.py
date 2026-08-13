@@ -14,8 +14,18 @@ class ReleaseEndpointValidationTest(unittest.TestCase):
     def test_accepts_absolute_https_endpoint(self):
         self.assertEqual(
             "https://api.example.test/v1",
-            MODULE.validate_release_endpoint(" https://api.example.test/v1/ "),
+            MODULE.validate_release_endpoint("https://api.example.test/v1"),
         )
+
+    def test_rejects_noncanonical_endpoint(self):
+        for endpoint in (
+            " https://api.example.test/v1",
+            "https://api.example.test/v1 ",
+            "https://api.example.test/v1/",
+        ):
+            with self.subTest(endpoint=endpoint):
+                with self.assertRaisesRegex(ValueError, "canonical"):
+                    MODULE.validate_release_endpoint(endpoint)
 
     def test_rejects_missing_endpoint(self):
         with self.assertRaisesRegex(ValueError, "required"):

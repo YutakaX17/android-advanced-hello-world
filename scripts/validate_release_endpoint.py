@@ -14,6 +14,10 @@ def validate_release_endpoint(value: str) -> str:
         raise ValueError(
             "releaseApiBaseUrl is required; supply -PreleaseApiBaseUrl=https://host"
         )
+    if endpoint != value or endpoint.endswith("/"):
+        raise ValueError(
+            "releaseApiBaseUrl must be canonical: no surrounding whitespace or trailing slash"
+        )
 
     parsed = urlsplit(endpoint)
     if parsed.scheme.lower() != "https":
@@ -30,7 +34,7 @@ def validate_release_endpoint(value: str) -> str:
     except ValueError as error:
         raise ValueError("releaseApiBaseUrl contains an invalid port") from error
 
-    return endpoint.rstrip("/")
+    return endpoint
 
 
 def main() -> int:
