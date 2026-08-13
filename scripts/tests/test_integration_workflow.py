@@ -18,6 +18,14 @@ class IntegrationWorkflowTest(unittest.TestCase):
         self.assertEqual(sorted(positions), positions)
         self.assertNotIn("module_installer modules.json --local-root", workflow)
 
+    def test_authenticates_package_resolution_and_bounds_diagnostics(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("GITHUB_ACTOR: ${{ github.actor }}", workflow)
+        self.assertIn("GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}", workflow)
+        self.assertIn("timeout-minutes: 2", workflow)
+        self.assertIn("timeout 20s adb logcat -d", workflow)
+        self.assertIn("timeout 20s docker logs", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
