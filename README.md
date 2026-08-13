@@ -38,5 +38,12 @@ requires a connected network and uses exponential retry backoff.
 
 Debug builds use `http://10.0.2.2:8000` as `BuildConfig.API_BASE_URL`, which reaches a
 backend running on the Android emulator host, and only the debug manifest permits cleartext
-traffic. Production builds must supply an HTTPS environment URL through the build
-configuration before distribution.
+traffic. Release builds require an independently supplied HTTPS endpoint and fail before
+compilation when it is missing, malformed, or non-HTTPS:
+
+```shell
+./gradlew -PreleaseApiBaseUrl=https://api.example.com lintRelease assembleRelease
+```
+
+The endpoint is public build configuration, not a credential. Do not include credentials,
+tokens, query parameters, or fragments in it.

@@ -32,5 +32,6 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew --no-daemon spotlessCheck detekt check lintDebug assembleDebug
+          ORG_GRADLE_PROJECT_releaseApiBaseUrl: https://api.example.invalid
+        run: ./gradlew --no-daemon spotlessCheck detekt check lintDebug assembleDebug lintRelease assembleRelease
         working-directory: android-advanced-hello-world

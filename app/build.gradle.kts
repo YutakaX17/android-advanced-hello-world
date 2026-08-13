@@ -4,6 +4,21 @@ plugins {
     alias(libs.plugins.jetbrains.compose)
 }
 
+val releaseApiBaseUrl = providers.gradleProperty("releaseApiBaseUrl").orElse("")
+
+val validateReleaseApiBaseUrl =
+    tasks.register<Exec>("validateReleaseApiBaseUrl") {
+        group = "verification"
+        description = "Requires a non-empty HTTPS backend URL for release builds."
+        workingDir(rootDir)
+        commandLine(
+            "python3",
+            "scripts/validate_release_endpoint.py",
+            "--url",
+            releaseApiBaseUrl.get(),
+        )
+    }
+
 android {
     namespace = "io.github.yutakax17.advancedhelloworld.android"
     compileSdk = 37
@@ -14,7 +29,20 @@ android {
         targetSdk = 37
         versionCode = 2
         versionName = "0.2.0"
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+        }
+        release {
+            val escapedUrl =
+                releaseApiBaseUrl
+                    .get()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+            buildConfigField("String", "API_BASE_URL", "\"$escapedUrl\"")
+        }
     }
 
     buildFeatures {
@@ -28,6 +56,12 @@ android {
 
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+}
+
+tasks.configureEach {
+    if (name == "preReleaseBuild") {
+        dependsOn(validateReleaseApiBaseUrl)
     }
 }
 
