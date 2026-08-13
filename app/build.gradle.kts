@@ -5,6 +5,10 @@ plugins {
 }
 
 val releaseApiBaseUrl = providers.gradleProperty("releaseApiBaseUrl").orElse("")
+val releaseKeystoreFile = providers.environmentVariable("ANDROID_KEYSTORE_FILE")
+val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
+val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
+val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD")
 
 val validateReleaseApiBaseUrl =
     tasks.register<Exec>("validateReleaseApiBaseUrl") {
@@ -48,11 +52,28 @@ android {
         versionName = "0.2.0"
     }
 
+    signingConfigs {
+        create("release") {
+            if (releaseKeystoreFile.isPresent) {
+                storeFile = file(releaseKeystoreFile.get())
+                storePassword = releaseKeystorePassword.orNull
+                keyAlias = releaseKeyAlias.orNull
+                keyPassword = releaseKeyPassword.orNull
+            }
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
         }
         release {
+            if (releaseKeystoreFile.isPresent) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             val escapedUrl =
                 releaseApiBaseUrl
                     .get()
