@@ -12,11 +12,13 @@ android {
         applicationId = "io.github.yutakax17.advancedhelloworld"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -36,10 +38,14 @@ dependencies {
     implementation(libs.advanced.hello.world.kmp.messages)
     implementation(libs.advanced.hello.world.compose.messages)
     implementation(libs.sqldelight.android.driver)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.work.runtime)
 
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.junit)
+    testImplementation(libs.ktor.client.mock)
     testImplementation(libs.robolectric)
+    testImplementation(libs.work.testing)
 }
 
 val checkModuleRegistry =

@@ -1,7 +1,7 @@
 {
   "$schema": "./modules.schema.json",
   "schemaVersion": 1,
-  "distributionVersion": "0.1.0",
+  "distributionVersion": "0.2.0",
   "featureContractVersion": 1,
   "startFeatureId": "messages",
   "modules": [
@@ -21,13 +21,13 @@
       "id": "kmp-messages",
       "kind": "domain",
       "coordinate": "io.github.yutakax17.advancedhelloworld:kmp-advanced-hello-world-messages",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "id": "messages",
       "kind": "feature",
       "coordinate": "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-messages",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "factoryClass": "io.github.yutakax17.advancedhelloworld.compose.messages.MessagesFeatureFactory",
       "dependenciesClass": "io.github.yutakax17.advancedhelloworld.compose.messages.MessagesUiDependencies"
     }

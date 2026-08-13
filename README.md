@@ -30,7 +30,13 @@ python3 -m unittest discover -s scripts/tests
 
 The Gradle `check` lifecycle also runs the generated-registry currentness check.
 
-The application composes the four immutable `0.1.0` family releases. Its process-scoped
-Android SQLDelight driver backs the shared durable message repository, so locally created
-messages and pending outbox operations survive activity and process recreation. Background
-synchronization and backend transport remain separate, ordered implementation slices.
+The `0.2.0` application composes KMP Core and Compose Core `0.1.0` with KMP Messages
+and Compose Messages `0.2.0`. Its process-scoped Android SQLDelight driver and Ktor
+client share one durable synchronization engine. Manual refresh and unique WorkManager
+jobs therefore reuse persisted outbox operations and idempotency keys. Background work
+requires a connected network and uses exponential retry backoff.
+
+Debug builds use `http://10.0.2.2:8000` as `BuildConfig.API_BASE_URL`, which reaches a
+backend running on the Android emulator host, and only the debug manifest permits cleartext
+traffic. Production builds must supply an HTTPS environment URL through the build
+configuration before distribution.

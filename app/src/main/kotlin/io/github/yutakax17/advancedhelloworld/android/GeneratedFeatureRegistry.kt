@@ -33,13 +33,13 @@ public object GeneratedFeatureRegistry {
             id = "kmp-messages",
             kind = "domain",
             coordinate = "io.github.yutakax17.advancedhelloworld:kmp-advanced-hello-world-messages",
-            version = "0.1.0",
+            version = "0.2.0",
         ),
         ModuleDescriptor(
             id = "messages",
             kind = "feature",
             coordinate = "io.github.yutakax17.advancedhelloworld:compose-advanced-hello-world-messages",
-            version = "0.1.0",
+            version = "0.2.0",
         ),
     )
 
