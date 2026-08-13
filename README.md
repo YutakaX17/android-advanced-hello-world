@@ -52,5 +52,6 @@ tokens, query parameters, or fragments in it.
 Tagged releases are fail-closed and require the protected `release` environment secrets
 `RELEASE_API_BASE_URL`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, and `ANDROID_KEY_PASSWORD`. The workflow verifies the tag against
-`modules.json`, builds signed APK/AAB artifacts, verifies the APK signature, records checksums
-and component metadata, and emits GitHub build provenance.
+`modules.json`, builds signed APK/AAB artifacts, verifies both signatures, validates the AAB
+with integrity-pinned bundletool, records checksums and component metadata, and emits GitHub
+build provenance.

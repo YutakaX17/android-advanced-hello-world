@@ -51,6 +51,12 @@ jobs:
       - name: Verify and describe artifacts
         run: |
           "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner" verify --verbose app/build/outputs/apk/release/app-release.apk
+          jarsigner -verify -strict -verbose app/build/outputs/bundle/release/app-release.aab
+          curl --fail --location --silent --show-error \
+            --output "$RUNNER_TEMP/bundletool.jar" \
+            https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar
+          echo "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29  $RUNNER_TEMP/bundletool.jar" | sha256sum --check --strict
+          java -jar "$RUNNER_TEMP/bundletool.jar" validate --bundle app/build/outputs/bundle/release/app-release.aab
           mkdir -p release
           python3 scripts/generate_release_metadata.py --manifest modules.json --revision "$GITHUB_SHA" --metadata release/component-metadata.json
       - uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
