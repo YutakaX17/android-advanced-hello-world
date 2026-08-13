@@ -49,6 +49,10 @@ must not contain surrounding whitespace or a trailing slash:
 The endpoint is public build configuration, not a credential. Do not include credentials,
 tokens, query parameters, or fragments in it.
 
+Instrumentation environments may override the debug endpoint with
+`-PdebugApiBaseUrl=http://127.0.0.1:8000`; CI pairs that value with an explicit
+`adb reverse tcp:8000 tcp:8000` bridge. Regular debug builds retain the emulator-host default.
+
 Tagged releases are fail-closed and require the protected `release` environment secrets
 `RELEASE_API_BASE_URL`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, and `ANDROID_KEY_PASSWORD`. The workflow verifies the tag against

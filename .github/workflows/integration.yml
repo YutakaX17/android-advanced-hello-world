@@ -64,7 +64,7 @@ jobs:
           docker run --name advanced-hello-world-e2e-db --health-cmd 'pg_isready -U advanced_hello_world -d advanced_hello_world' --health-interval 2s --health-retries 30 -e POSTGRES_DB=advanced_hello_world -e POSTGRES_USER=advanced_hello_world -e POSTGRES_PASSWORD=integration-password -p 5432:5432 -d postgres:17.5-alpine
           until [ "$(docker inspect --format='{{.State.Health.Status}}' advanced-hello-world-e2e-db)" = healthy ]; do sleep 2; done
           python manage.py migrate
-          nohup python manage.py runserver 0.0.0.0:8000 > backend.log 2>&1 &
+          nohup python manage.py runserver --noreload 0.0.0.0:8000 > backend.log 2>&1 &
           until curl --fail --silent http://127.0.0.1:8000/api/v1/health/live; do sleep 2; done
       - uses: actions/setup-java@d7793b545071e98d581d3bf084a51c3213318a07 # v4
         with:
@@ -80,7 +80,9 @@ jobs:
           arch: x86_64
           disable-animations: true
           working-directory: android-advanced-hello-world
-          script: ./gradlew --no-daemon connectedDebugAndroidTest
+          script: |
+            adb reverse tcp:8000 tcp:8000
+            ./gradlew --no-daemon -PdebugApiBaseUrl=http://127.0.0.1:8000 connectedDebugAndroidTest
       - name: Capture diagnostics
         if: failure()
         timeout-minutes: 2

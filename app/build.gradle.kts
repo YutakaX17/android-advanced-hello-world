@@ -5,6 +5,7 @@ plugins {
 }
 
 val releaseApiBaseUrl = providers.gradleProperty("releaseApiBaseUrl").orElse("")
+val debugApiBaseUrl = providers.gradleProperty("debugApiBaseUrl").orElse("http://10.0.2.2:8000")
 val releaseKeystoreFile = providers.environmentVariable("ANDROID_KEYSTORE_FILE")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -66,7 +67,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+            val escapedUrl =
+                debugApiBaseUrl
+                    .get()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+            buildConfigField("String", "API_BASE_URL", "\"$escapedUrl\"")
         }
         release {
             if (releaseKeystoreFile.isPresent) {

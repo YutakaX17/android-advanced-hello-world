@@ -26,6 +26,13 @@ class IntegrationWorkflowTest(unittest.TestCase):
         self.assertIn("timeout 20s adb logcat -d", workflow)
         self.assertIn("timeout 20s docker logs", workflow)
 
+    def test_bridges_emulator_loopback_to_stable_backend(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("runserver --noreload 0.0.0.0:8000", workflow)
+        reverse = "adb reverse tcp:8000 tcp:8000"
+        build = "-PdebugApiBaseUrl=http://127.0.0.1:8000 connectedDebugAndroidTest"
+        self.assertLess(workflow.index(reverse), workflow.index(build))
+
 
 if __name__ == "__main__":
     unittest.main()
