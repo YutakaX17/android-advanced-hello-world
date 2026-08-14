@@ -25,11 +25,12 @@ class ReleaseBuildConfigVerificationTest(unittest.TestCase):
             )
 
     def test_rejects_debug_emulator_url(self):
-        with self.assertRaisesRegex(ValueError, "debug emulator"):
+        with self.assertRaisesRegex(ValueError, "forbidden endpoint"):
             MODULE.verify_build_config(
                 'public static final String API_BASE_URL = "https://api.example.test"; '
                 + MODULE.DEBUG_EMULATOR_URL,
                 "https://api.example.test",
+                (MODULE.DEBUG_EMULATOR_URL,),
             )
 
 

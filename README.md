@@ -60,6 +60,13 @@ Tagged releases are fail-closed and require the protected `release` environment 
 with integrity-pinned bundletool, records checksums and component metadata, and emits GitHub
 build provenance.
 
+Non-production `dev-v*` tags publish a separate `.development` application as a GitHub
+prerelease. It is minified, uses CI's disposable debug signing key, and connects through
+`adb reverse` to `http://127.0.0.1:8000`. See the
+[development release user guide](docs/development-release-user-guide.md) for backend,
+physical-device, emulator, APK, and AAB instructions. Development artifacts must never be
+promoted to production.
+
 The Integration workflow boots immutable backend/core/messages revisions with PostgreSQL and
 runs an Android instrumentation journey on an emulator. It proves that an offline message
 survives store recreation, uploads after synchronization, and that a backend-originated

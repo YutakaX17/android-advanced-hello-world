@@ -1,0 +1,41 @@
+import pathlib
+import unittest
+
+
+ROOT = pathlib.Path(__file__).parents[2]
+WORKFLOW = ROOT / ".github" / "workflows" / "development-release.yml"
+BUILD = ROOT / "app" / "build.gradle.kts"
+
+
+class DevelopmentReleaseWorkflowTest(unittest.TestCase):
+    def test_uses_non_production_tag_and_prerelease(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('tags: ["dev-v*"]', workflow)
+        self.assertIn('"dev-v$(python3', workflow)
+        self.assertIn("prerelease: true", workflow)
+        self.assertNotIn('tags: ["v*"]', workflow)
+
+    def test_verifies_both_artifacts_before_publication(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        ordered_gates = (
+            'apksigner" verify --verbose',
+            "jarsigner -verify -strict -verbose",
+            "sha256sum --check --strict",
+            'bundletool.jar" validate --bundle',
+            "Generate checksums",
+            "attest-build-provenance",
+            "action-gh-release",
+        )
+        positions = [workflow.index(gate) for gate in ordered_gates]
+        self.assertEqual(sorted(positions), positions)
+
+    def test_development_variant_is_isolated_and_debug_signed(self):
+        build = BUILD.read_text(encoding="utf-8")
+        self.assertIn('create("development")', build)
+        self.assertIn('applicationIdSuffix = ".development"', build)
+        self.assertIn('signingConfigs.getByName("debug")', build)
+        self.assertIn('orElse("http://127.0.0.1:8000")', build)
+
+
+if __name__ == "__main__":
+    unittest.main()
