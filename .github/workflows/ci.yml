@@ -28,10 +28,15 @@ jobs:
         run: |
           python3 scripts/generate_feature_registry.py --check
           python3 -m unittest discover -s scripts/tests
-      - name: Resolve published releases, test, lint, and build standalone APK
+      - name: Resolve published releases, test, lint, and build standalone artifacts
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_releaseApiBaseUrl: https://api.example.invalid
-        run: ./gradlew --no-daemon spotlessCheck detekt check lintDebug assembleDebug verifyReleaseBuildConfig lintRelease assembleRelease
+        run: >-
+          ./gradlew --no-daemon
+          spotlessCheck detekt check
+          lintDebug assembleDebug
+          verifyDevelopmentBuildConfig lintDevelopment assembleDevelopment bundleDevelopment
+          verifyReleaseBuildConfig lintRelease assembleRelease
         working-directory: android-advanced-hello-world

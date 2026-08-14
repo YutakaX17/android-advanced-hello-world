@@ -4,6 +4,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "development-release.yml"
+CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 BUILD = ROOT / "app" / "build.gradle.kts"
 
 
@@ -35,6 +36,12 @@ class DevelopmentReleaseWorkflowTest(unittest.TestCase):
         self.assertIn('applicationIdSuffix = ".development"', build)
         self.assertIn('signingConfigs.getByName("debug")', build)
         self.assertIn('orElse("http://127.0.0.1:8000")', build)
+
+    def test_pull_request_ci_builds_apk_and_aab(self):
+        workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("lintDevelopment", workflow)
+        self.assertIn("assembleDevelopment", workflow)
+        self.assertIn("bundleDevelopment", workflow)
 
 
 if __name__ == "__main__":
