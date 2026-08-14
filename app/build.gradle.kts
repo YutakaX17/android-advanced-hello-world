@@ -6,6 +6,8 @@ plugins {
 
 val releaseApiBaseUrl = providers.gradleProperty("releaseApiBaseUrl").orElse("")
 val debugApiBaseUrl = providers.gradleProperty("debugApiBaseUrl").orElse("http://10.0.2.2:8000")
+val developmentApiBaseUrl =
+    providers.gradleProperty("developmentApiBaseUrl").orElse("http://127.0.0.1:8000")
 val releaseKeystoreFile = providers.environmentVariable("ANDROID_KEYSTORE_FILE")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -38,6 +40,25 @@ val verifyReleaseBuildConfig =
                 "io/github/yutakax17/advancedhelloworld/android/BuildConfig.java",
             "--expected-url",
             releaseApiBaseUrl.get(),
+            "--forbid-url",
+            "http://10.0.2.2:8000",
+        )
+    }
+
+val verifyDevelopmentBuildConfig =
+    tasks.register<Exec>("verifyDevelopmentBuildConfig") {
+        group = "verification"
+        description = "Verifies the exact endpoint embedded in development BuildConfig."
+        dependsOn("generateDevelopmentBuildConfig")
+        workingDir(rootDir)
+        commandLine(
+            "python3",
+            "scripts/verify_release_build_config.py",
+            "--build-config",
+            "app/build/generated/source/buildConfig/development/" +
+                "io/github/yutakax17/advancedhelloworld/android/BuildConfig.java",
+            "--expected-url",
+            developmentApiBaseUrl.get(),
         )
     }
 
@@ -69,6 +90,22 @@ android {
         debug {
             val escapedUrl =
                 debugApiBaseUrl
+                    .get()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+            buildConfigField("String", "API_BASE_URL", "\"$escapedUrl\"")
+        }
+        create("development") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".development"
+            versionNameSuffix = "-development"
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            matchingFallbacks += listOf("release", "debug")
+            val escapedUrl =
+                developmentApiBaseUrl
                     .get()
                     .replace("\\", "\\\\")
                     .replace("\"", "\\\"")
@@ -110,6 +147,9 @@ tasks.configureEach {
     }
     if (name == "assembleRelease" || name == "lintRelease") {
         dependsOn(verifyReleaseBuildConfig)
+    }
+    if (name == "assembleDevelopment" || name == "bundleDevelopment" || name == "lintDevelopment") {
+        dependsOn(verifyDevelopmentBuildConfig)
     }
 }
 
