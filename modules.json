@@ -1,7 +1,7 @@
 {
   "$schema": "./modules.schema.json",
   "schemaVersion": 1,
-  "distributionVersion": "0.2.0",
+  "distributionVersion": "0.2.1",
   "featureContractVersion": 1,
   "startFeatureId": "messages",
   "modules": [

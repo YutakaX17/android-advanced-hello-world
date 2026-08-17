@@ -30,7 +30,7 @@ python3 -m unittest discover -s scripts/tests
 
 The Gradle `check` lifecycle also runs the generated-registry currentness check.
 
-The `0.2.0` application composes KMP Core and Compose Core `0.1.0` with KMP Messages
+The `0.2.1` application composes KMP Core and Compose Core `0.1.0` with KMP Messages
 and Compose Messages `0.2.0`. Its process-scoped Android SQLDelight driver and Ktor
 client share one durable synchronization engine. Manual refresh and unique WorkManager
 jobs therefore reuse persisted outbox operations and idempotency keys. Background work

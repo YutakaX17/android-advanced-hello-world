@@ -19,8 +19,7 @@ class DevelopmentReleaseWorkflowTest(unittest.TestCase):
     def test_verifies_both_artifacts_before_publication(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
         ordered_gates = (
-            'apksigner" verify --verbose',
-            "jarsigner -verify -strict -verbose",
+            "verify_development_artifact_signing.py",
             "sha256sum --check --strict",
             'bundletool.jar" validate --bundle',
             "Generate checksums",
@@ -29,6 +28,17 @@ class DevelopmentReleaseWorkflowTest(unittest.TestCase):
         )
         positions = [workflow.index(gate) for gate in ordered_gates]
         self.assertEqual(sorted(positions), positions)
+
+    def test_uses_development_signer_equality_without_weakening_production(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        production_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("--apksigner", workflow)
+        self.assertIn("--apk app/build/outputs/apk/development/app-development.apk", workflow)
+        self.assertIn("--aab app/build/outputs/bundle/development/app-development.aab", workflow)
+        self.assertNotIn("jarsigner -verify -strict", workflow)
+        self.assertIn("jarsigner -verify -strict", production_workflow)
 
     def test_development_variant_is_isolated_and_debug_signed(self):
         build = BUILD.read_text(encoding="utf-8")

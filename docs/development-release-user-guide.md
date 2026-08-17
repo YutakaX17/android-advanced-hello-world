@@ -97,8 +97,8 @@ java -jar bundletool-all-1.18.3.jar validate \
 ## Development release process
 
 1. Merge an approved change after CI, Security, and Integration pass on the exact head.
-2. Create `dev-v<distributionVersion>` from the reviewed `main` commit. For version 0.2.0,
-   the tag is `dev-v0.2.0`.
+2. Create `dev-v<distributionVersion>` from the reviewed `main` commit. For version 0.2.1,
+   the tag is `dev-v0.2.1`.
 3. The Development release workflow reruns backend/device integration, builds and verifies
    the APK and AAB, validates the AAB, and produces checksums, an SBOM, component metadata,
    and provenance.
